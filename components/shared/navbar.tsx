@@ -41,7 +41,9 @@ export function Navbar() {
       case "nurse":
         return [
           ...baseLinks,
-          { href: "/nurse/queue", label: "Queue" },
+          
+          { href: "/nurse/rooms", label: "Room management" },
+          { href: "/nurse/queue", label: "Queue management" },
           { href: "/nurse/patients", label: "Patients" },
           { href: "/nurse/profile", label: "Profile" },
         ]

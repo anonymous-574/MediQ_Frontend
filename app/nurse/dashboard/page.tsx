@@ -22,8 +22,9 @@ export default function NurseDashboard() {
   if (!user) return null
 
   return (
-    <NurseLayout>
-      <div className="space-y-6">
+    <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Hello, {user.name}</h1>
           <p className="text-muted-foreground">Manage patient flow and coordinate care</p>
@@ -88,6 +89,11 @@ export default function NurseDashboard() {
           </div>
         </div>
       </div>
-    </NurseLayout>
+
+          
+          </div>
+          </div>
+      
+   
   )
 }
