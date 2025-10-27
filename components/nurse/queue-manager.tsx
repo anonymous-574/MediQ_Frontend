@@ -4,15 +4,14 @@ import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Clock, User, ArrowRight, RotateCcw, Loader2, RefreshCw } from "lucide-react"
+import { Clock, RefreshCw, Loader2 } from "lucide-react"
 import { apiService } from "@/lib/api"
 import { useToast } from "@/components/shared/toast"
-import type { DoctorQueue } from "@/lib/types"
+import type { NurseQueueReport } from "@/lib/types"
 
 export function QueueManager() {
   const { showToast } = useToast()
-  const [queueData, setQueueData] = useState<DoctorQueue | null>(null)
+  const [queueData, setQueueData] = useState<NurseQueueReport[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
@@ -24,7 +23,7 @@ export function QueueManager() {
     try {
       setLoading(true)
       const response = await apiService.getNurseQueue()
-      setQueueData(response)
+      setQueueData(response) // response should be an array of queue reports
     } catch (error) {
       console.error("Failed to fetch queue data:", error)
       showToast("Failed to load queue data", "error")
@@ -46,41 +45,6 @@ export function QueueManager() {
     }
   }
 
-  const handleMovePatient = async (patientId: string, newStatus: string) => {
-    try {
-      await apiService.updatePatientStatus(patientId, newStatus)
-      showToast("Patient status updated", "success")
-      await fetchQueueData()
-    } catch (error) {
-      console.error("Failed to update patient status:", error)
-      showToast("Failed to update patient status", "error")
-    }
-  }
-
-  const handlePriorityChange = async (patientId: string, newPriority: string) => {
-    try {
-      await apiService.updatePatientStatus(patientId, newPriority)
-      showToast("Patient priority updated", "success")
-      await fetchQueueData()
-    } catch (error) {
-      console.error("Failed to update patient priority:", error)
-      showToast("Failed to update patient priority", "error")
-    }
-  }
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
-      case "high":
-        return "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300"
-      case "normal":
-        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
-    }
-  }
-
   if (loading) {
     return (
       <Card>
@@ -91,7 +55,7 @@ export function QueueManager() {
     )
   }
 
-  if (!queueData || !queueData.patients.length) {
+  if (!queueData || queueData.length === 0) {
     return (
       <Card>
         <CardHeader>
@@ -99,10 +63,10 @@ export function QueueManager() {
             <Clock className="h-5 w-5" />
             Queue Management
           </CardTitle>
-          <CardDescription>Coordinate patient queues across all doctors</CardDescription>
+          <CardDescription>No active queue reports found</CardDescription>
         </CardHeader>
         <CardContent className="text-center py-8">
-          <p className="text-muted-foreground">No patients in queue</p>
+          <p className="text-muted-foreground">No queue reports available</p>
         </CardContent>
       </Card>
     )
@@ -117,7 +81,7 @@ export function QueueManager() {
               <Clock className="h-5 w-5" />
               Queue Management
             </CardTitle>
-            <CardDescription>Coordinate patient queues across all doctors</CardDescription>
+            <CardDescription>Recent queue status reports from nurses</CardDescription>
           </div>
           <Button
             variant="outline"
@@ -126,84 +90,33 @@ export function QueueManager() {
             disabled={refreshing}
             className="flex items-center gap-2"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-4">
+        <div className="space-y-4">
+          {queueData.map((report) => (
+            <div
+              key={report.report_id}
+              className="flex items-center justify-between border rounded-lg p-4 hover:bg-muted/40 transition"
+            >
               <div>
-                <h3 className="font-medium">Current Queue</h3>
+                <p className="font-medium">{report.department}</p>
                 <p className="text-sm text-muted-foreground">
-                  Total patients: {queueData.totalInQueue}
+                  Queue Length: {report.queue_length} | Avg Wait: {report.wait_time_reported} min
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Reported by: {report.submitted_by} | {report.timestamp}
                 </p>
               </div>
-              <Badge variant="outline">{queueData.patients.length} patients</Badge>
+
+              <Badge variant={report.is_validated ? "default" : "secondary"}>
+                {report.is_validated ? "Validated" : "Pending"}
+              </Badge>
             </div>
-
-            <div className="space-y-3">
-              {queueData.patients.map((patient, patientIndex) => (
-                <div
-                  key={patient.patient_id}
-                  className={`flex items-center justify-between p-3 rounded-lg border ${
-                    patientIndex === 0 ? "border-primary bg-primary/5" : "border-border"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-muted rounded-full flex items-center justify-center">
-                      <User className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <p className="font-medium">{patient.name}</p>
-                      <p className="text-sm text-muted-foreground">Wait: {patient.wait_time} min</p>
-                      <p className="text-xs text-muted-foreground">Appointment: {patient.appointment_time}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <Select
-                      value={patient.status}
-                      onValueChange={(value) => handlePriorityChange(patient.patient_id, value)}
-                    >
-                      <SelectTrigger className="w-32">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="waiting">Waiting</SelectItem>
-                        <SelectItem value="in_progress">In Progress</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="cancelled">Cancelled</SelectItem>
-                      </SelectContent>
-                    </Select>
-
-                    <Badge className={getPriorityColor(patient.status)}>{patient.status}</Badge>
-
-                    <div className="flex gap-1">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleMovePatient(patient.patient_id, "in_progress")}
-                        title="Move to next"
-                      >
-                        <ArrowRight className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleMovePatient(patient.patient_id, "completed")}
-                        title="Mark complete"
-                      >
-                        <RotateCcw className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </CardContent>
     </Card>

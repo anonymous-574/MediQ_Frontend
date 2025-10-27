@@ -83,6 +83,16 @@ export interface QueueReport {
   submitted_by?: string
 }
 
+export interface NurseQueueReport {
+  report_id: string
+  department: string
+  queue_length: number
+  wait_time_reported: number
+  submitted_by: string
+  is_validated: boolean
+  timestamp: string
+}
+
 export interface Analytics {
   hospital_id: string
   name: string

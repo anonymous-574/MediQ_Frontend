@@ -1,102 +1,168 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock } from "lucide-react"
-
-const mockQueueData = [
-  { id: 1, position: 1, patient: "John Doe", doctor: "Dr. Smith", waitTime: 5, status: "In Progress" },
-  { id: 2, position: 2, patient: "Jane Smith", doctor: "Dr. Smith", waitTime: 15, status: "Waiting" },
-  { id: 3, position: 3, patient: "Bob Johnson", doctor: "Dr. Brown", waitTime: 25, status: "Waiting" },
-  { id: 4, position: 4, patient: "Alice Brown", doctor: "Dr. Brown", waitTime: 35, status: "Waiting" },
-]
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Clock, RefreshCw, Loader2, CheckCircle, AlertCircle } from "lucide-react"
+import { apiService } from "@/lib/api"
+import { useToast } from "@/components/shared/toast"
+import { QueueManager } from "@/components/nurse/queue-manager"
+import { QueueReportDialog } from "@/components/nurse/queue-report-dialog"
+import type { NurseQueueReport, DoctorQueue } from "@/lib/types"
 
 export default function NurseQueuePage() {
+  const { showToast } = useToast()
+  const [queueReports, setQueueReports] = useState<NurseQueueReport[]>([])
+  const [patientQueue, setPatientQueue] = useState<DoctorQueue | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+
+  useEffect(() => {
+    fetchQueueData()
+  }, [])
+
+  const fetchQueueData = async () => {
+    try {
+      setLoading(true)
+      const [reportsResponse, queueResponse] = await Promise.all([
+        apiService.getNurseQueue(),
+        apiService.getNurseQueue()
+      ])
+      
+      // Handle queue reports (from backend /nurse/queue endpoint)
+      if (Array.isArray(reportsResponse)) {
+        setQueueReports(reportsResponse)
+      }
+      
+      // Handle patient queue data
+      if (queueResponse && queueResponse.patients) {
+        setPatientQueue(queueResponse)
+      }
+    } catch (error) {
+      console.error("Failed to fetch queue data:", error)
+      showToast("Failed to load queue data", "error")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true)
+      await fetchQueueData()
+      showToast("Queue updated", "success")
+    } catch (error) {
+      console.error("Failed to refresh queue:", error)
+      showToast("Failed to refresh queue", "error")
+    } finally {
+      setRefreshing(false)
+    }
+  }
+
+  const handleReportSubmitted = () => {
+    fetchQueueData()
+  }
+
+  const getValidationBadge = (isValidated: boolean) => {
+    if (isValidated) {
+      return (
+        <Badge variant="default" className="flex items-center gap-1">
+          <CheckCircle className="h-3 w-3" />
+          Validated
+        </Badge>
+      )
+    }
+    return (
+      <Badge variant="secondary" className="flex items-center gap-1">
+        <AlertCircle className="h-3 w-3" />
+        Pending
+      </Badge>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-
-<div className="min-h-screen   ">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
-        <p className="text-muted-foreground mt-2">Manage hospital patient queues</p>
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Total Patients</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{mockQueueData.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">1</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Avg Wait Time</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">20 min</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Queue</CardTitle>
-          <CardDescription>All patients in queue</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {mockQueueData.map((patient) => (
-              <div key={patient.id} className="flex items-center justify-between border-b pb-3 last:border-0">
-                <div className="flex items-center gap-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
-                    {patient.position}
-                  </div>
-                  <div>
-                    <p className="font-medium">{patient.patient}</p>
-                    <p className="text-sm text-muted-foreground">{patient.doctor}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="text-right">
-                    <p className="text-sm font-medium flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {patient.waitTime} min
-                    </p>
-                  </div>
-                  <Badge variant={patient.status === "In Progress" ? "default" : "secondary"}>{patient.status}</Badge>
-                  <Button size="sm" variant="outline">
-                    Call Next
-                  </Button>
-                </div>
-              </div>
-            ))}
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Queue Management</h1>
+            <p className="text-muted-foreground mt-2">Manage hospital patient queues and reports</p>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-3">
+            <QueueReportDialog onReportSubmitted={handleReportSubmitted} />
+            <Button
+              variant="outline"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+          </div>
+        </div>
+
+        {/* Queue Reports Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Queue Reports
+            </CardTitle>
+            <CardDescription>Recent queue reports from all departments</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {queueReports.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No queue reports available</p>
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Department</TableHead>
+                    <TableHead>Queue Length</TableHead>
+                    <TableHead>Wait Time</TableHead>
+                    <TableHead>Submitted By</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Timestamp</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {queueReports.map((report) => (
+                    <TableRow key={report.report_id}>
+                      <TableCell className="font-medium">{report.department}</TableCell>
+                      <TableCell>{report.queue_length}</TableCell>
+                      <TableCell>{report.wait_time_reported} min</TableCell>
+                      <TableCell>{report.submitted_by}</TableCell>
+                      <TableCell>{getValidationBadge(report.is_validated)}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(report.timestamp).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Patient Queue Management */}
+        <QueueManager />
+      </div>
     </div>
-    </div>
-   
   )
 }

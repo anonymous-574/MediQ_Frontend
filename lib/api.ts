@@ -109,7 +109,11 @@ class ApiService {
     const response = await this.axiosInstance.get("/patient/appointments")
     return response.data
   }
-
+  async getNurseProfile() {
+    const response = await this.axiosInstance.get("/nurse/profile")
+    return response.data
+  }
+  
   async submitQueueReport(data: { hospital_id: string; queue_length: number; wait_time: number; department: string }) {
     const response = await this.axiosInstance.post("/patient/submit_queue_report", data)
     return response.data
@@ -237,6 +241,16 @@ class ApiService {
 
   async updatePatientStatus(patientId: string, status: string) {
     const response = await this.axiosInstance.put("/nurse/update_patient_status", { patient_id: patientId, status })
+    return response.data
+  }
+
+  async submitNurseQueueReport(data: { 
+    hospital_id: number; 
+    queue_length: number; 
+    wait_time_reported: number; 
+    department: string 
+  }) {
+    const response = await this.axiosInstance.post("/nurse/submit_queue_report", data)
     return response.data
   }
 
