@@ -5,10 +5,9 @@ import { Badge } from "@/components/ui/badge"
 import { MapPin, Clock } from "lucide-react"
 
 const mockRooms = [
-  { id: 1, name: "Room 101", status: "Occupied", patient: "John Doe", doctor: "Dr. Smith", timeUsed: "15 min" },
-  { id: 2, name: "Room 102", status: "Occupied", patient: "Jane Smith", doctor: "Dr. Brown", timeUsed: "10 min" },
-  { id: 3, name: "Room 103", status: "Available", patient: null, doctor: null, timeUsed: null },
-  { id: 4, name: "Room 104", status: "Cleaning", patient: null, doctor: null, timeUsed: null },
+  { id: 1, name: "Room 101", status: "Occupied", patient: "Samarth Dave", doctor: "Dr. Tisha parmar", timeUsed: "15 min" },
+  { id: 2, name: "Room 102", status: "Available", patient: "null", doctor: "null", timeUsed: "null" },
+  
 ]
 
 export default function NurseRoomsPage() {
