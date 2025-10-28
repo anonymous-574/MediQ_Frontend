@@ -29,7 +29,7 @@ export default function ReportsPage() {
         {
           id: 1,
           title: "Blood Test Results",
-          doctor: "Dr. Sarah Johnson",
+          doctor: "Dr Tisha parmar",
           date: "2024-01-12",
           type: "Lab Report",
           status: "completed",
@@ -40,7 +40,7 @@ export default function ReportsPage() {
         {
           id: 2,
           title: "Chest X-Ray Report",
-          doctor: "Dr. Michael Chen",
+          doctor: "Dr Tisha parmar",
           date: "2024-01-10",
           type: "Imaging",
           status: "completed",
@@ -88,7 +88,6 @@ export default function ReportsPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="space-y-6">

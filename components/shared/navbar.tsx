@@ -28,6 +28,7 @@ export function Navbar() {
           { href: "/patient/appointments", label: "Appointments" },
           { href: "/patient/symptoms", label: "Symptoms" },
           { href: "/patient/queue", label: "Queue Status" },
+          { href: "/patient/reports", label: "Medical Records" },
           { href: "/patient/profile", label: "Profile" },
         ]
       case "doctor":
