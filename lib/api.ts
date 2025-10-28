@@ -184,7 +184,11 @@ class ApiService {
     const response = await this.axiosInstance.get("/admin/stats")
     return response.data
   }
-
+  async getAllAppointments() {
+    const response = await this.axiosInstance.get("/admin/appointments")
+    return response.data
+  }
+  
   async getAllUsers() {
     const response = await this.axiosInstance.get("/admin/users")
     return response.data
