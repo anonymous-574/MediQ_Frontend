@@ -221,8 +221,8 @@ class ApiService {
     return response.data
   }
 
-  async getDoctorAvailableSlots(doctorId: string, date: string) {
-    // ✅ Changed from /hospital/get_available_slots to /doctor/available_slots
+   async getDoctorAvailableSlots(doctorId: string, date: string) {
+    // ✅ Note: doctorId is passed as integer in URL path
     const response = await this.axiosInstance.get(`/doctor/available_slots/${doctorId}?date=${date}`)
     return response.data
   }
