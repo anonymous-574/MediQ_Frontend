@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  #output: 'export', // ✅ Enables static export (creates /out directory)
+  //output: 'export', // ✅ Enables static export (creates /out directory)
 
   typescript: {
     ignoreBuildErrors: true,
