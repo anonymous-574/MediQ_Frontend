@@ -80,7 +80,9 @@ export default function AdminAnalyticsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
         <p className="text-muted-foreground mt-2">Hospital performance metrics and insights</p>
@@ -167,5 +169,8 @@ export default function AdminAnalyticsPage() {
         </CardContent>
       </Card>
     </div>
+        </div>
+        </div>
+    
   )
 }

@@ -28,6 +28,7 @@ export function Navbar() {
           { href: "/patient/appointments", label: "Appointments" },
           { href: "/patient/symptoms", label: "Symptoms" },
           { href: "/patient/queue", label: "Queue Status" },
+          { href: "/patient/reports", label: "Medical Records" },
           { href: "/patient/profile", label: "Profile" },
         ]
       case "doctor":
@@ -51,9 +52,11 @@ export function Navbar() {
         return [
           ...baseLinks,
           { href: "/admin/analytics", label: "Analytics" },
-          { href: "/admin/hospitals", label: "Hospitals" },
+          { href: "/admin/appointments", label: "Appointments" },
+          { href: "/admin/reports", label: "Reports" },
           { href: "/admin/users", label: "Users" },
           { href: "/admin/settings", label: "Settings" },
+          { href: "/admin/system", label: "System" },
         ]
       default:
         return baseLinks

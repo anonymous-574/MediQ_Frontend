@@ -185,7 +185,7 @@ export default function AdminUsersPage() {
             )}
           </div>
         </div>
-      </div>
+    
 
       {/* Add User Modal */}
       <Modal

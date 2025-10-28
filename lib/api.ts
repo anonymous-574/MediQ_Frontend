@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type AxiosError } from "axios"
 import type { ApiResponse, AuthResponse } from "./types" // Declare ApiResponse and AuthResponse
 
-const API_BASE_URL = "http://127.0.0.1:5000/api"
+const API_BASE_URL = "https://mediq-backend-xp20.onrender.com"
 
 interface ApiErrorResponse {
   message?: string
@@ -184,7 +184,11 @@ class ApiService {
     const response = await this.axiosInstance.get("/admin/stats")
     return response.data
   }
-
+  async getAllAppointments() {
+    const response = await this.axiosInstance.get("/admin/appointments")
+    return response.data
+  }
+  
   async getAllUsers() {
     const response = await this.axiosInstance.get("/admin/users")
     return response.data

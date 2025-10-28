@@ -8,7 +8,9 @@ import { Switch } from "@/components/ui/switch"
 
 export default function AdminSettingsPage() {
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-background">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
         <p className="text-muted-foreground mt-2">Configure hospital system settings</p>
@@ -91,5 +93,8 @@ export default function AdminSettingsPage() {
         </CardContent>
       </Card>
     </div>
+        </div>
+        </div>
+   
   )
 }
