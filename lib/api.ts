@@ -222,7 +222,8 @@ class ApiService {
   }
 
   async getDoctorAvailableSlots(doctorId: string, date: string) {
-    const response = await this.axiosInstance.get(`/hospital/get_available_slots?doctor_id=${doctorId}&date=${date}`)
+    // ✅ Changed from /hospital/get_available_slots to /doctor/available_slots
+    const response = await this.axiosInstance.get(`/doctor/available_slots/${doctorId}?date=${date}`)
     return response.data
   }
 
