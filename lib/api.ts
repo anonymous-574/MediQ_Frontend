@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type AxiosError } from "axios"
 import type { ApiResponse, AuthResponse } from "./types" // Declare ApiResponse and AuthResponse
 
-const API_BASE_URL = "http://127.0.0.1:5000/api"
+const API_BASE_URL = "https://mediq-backend-xp20.onrender.com/api"
 
 interface ApiErrorResponse {
   message?: string
